@@ -1,6 +1,6 @@
 # CarND-Controls-PID
 Udacity Self-Driving Car Engineer Nanodegree Program: Term 2
-[Master project repo](https://github.com/udacity/CarND-Kidnapped-Vehicle-Project)
+[Master project repo](https://github.com/udacity/CarND-PID-Control-Project)
 
 This project implements a PID controller for a simulated autonomous vehicle, using the cross-track error (CTE). After tuning the three parameters for the controller, the car is able to drive autonomously around the track continously at speeds over 50 mph (maximum speed ~ 65 mph).
 
