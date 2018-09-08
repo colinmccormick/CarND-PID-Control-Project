@@ -1,5 +1,36 @@
 # CarND-Controls-PID
-Self-Driving Car Engineer Nanodegree Program
+Udacity Self-Driving Car Engineer Nanodegree Program: Term 2
+[Master project repo](https://github.com/udacity/CarND-Kidnapped-Vehicle-Project)
+
+This project implements a PID controller for a simulated autonomous vehicle, using the cross-track error (CTE). After tuning the three parameters for the controller, the car is able to drive autonomously around the track continously at speeds over 50 mph (maximum speed ~ 65 mph).
+
+This project uses the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases).
+
+## Project structure
+
+The project consists of the following primary components:
+* src/main.cpp - Responsible for interfacing with the simulator and reading (simulated) CTE data
+* src/PID.cpp, .h - Responsible for implementing the PID controller and holding all values associated with it
+
+## PID controller concepts
+
+One approach to autonomously controlling the steering of a car is to steer in proportion to the cross-track error (CTE), which is how far the car is to the left or right of the center of the lane. By tuning a parameter known as Kp, this method steers back to the center of the lane either sharply or gradually. However, for all values of Kp, the track of the vehicle overshoots, and the vehicle oscillates back and forth across the lane center as it travels forward.
+
+To mitigate this, it's possible to add a term to the steering value that's proportional to the derivative of CTE, i.e. how quickly CTE is changing. This mitigates fast turns and tends to reduce "wobbling". A final consideration is whether the vehicle has a constant "drift" in the steering, which occurs in real-world cars. With proportional and derivative-based steering only, this leads to a vehicle trajectory with a constant offset from the lane center. Adding a term to the steering value proportional to the integral of the CTE with time serves to prevent this.
+
+The three terms are labeled "P" (proportional), "I" (integral), and "D" (differential), hence "PID" controller.
+
+### Tuning PID parameters 
+
+While implementing a PID controller in code is relatively easy, the primary challenge is tuning the parameters to find values that will result in as smooth a ride as possible. This is non-trivial, and there are many combinations of Kp, Ki and Kd that will accomplish this. 
+
+While it's possible to implement auto-tuning of the parameters (such as using the "Twiddle" algorithm), this was difficult to implement in this project because the code interfacing with the simulator was confusing. Also, the simulator appears to be somewhat stochastic, meaning that the exact same PID parameters will result in slightly different trajectories and cumulative CTE run-to-run. 
+
+Instead, I manually tuned the parameters, arriving at successful values after about an hour. One remarkable point about this is that they differ by several orders of magnitude. The largest is Kd, with Kp two orders of magnitude smaller, and Ki another two orders of magnitude smaller again. This is probably because the optimum controller has roughly equal contributions from these three terms, and the values of CTE, its derivative, and its integral vary by at least an order of magnitude (the integral is likely the largest, followed by the direct, instantaneous value, and finally the derivative as the smallest). 
+
+### Speed
+
+I increased the throtle from 0.3 to 0.6 (before tuning the PID parameters). The car completes most of the lap at or above 60 mph.
 
 ---
 

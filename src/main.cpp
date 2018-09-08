@@ -35,6 +35,15 @@ int main()
   PID pid;
   // TODO: Initialize the pid variable.
 
+  // Restart @ 8000 frames (~ 3 laps)
+  // Manually tune PID parameters (~ 1 hour)
+  // Use sum of square of CTE as overall success metric
+  // Simulator appears to be stochastic; values vary run-by-run
+  // Accumulate square of CTE over 8000 frames (~3 laps) to mitigate this
+  // Still not very successful: 
+  // These parameters result in successful driving but sum of squared CTE ranges rom 4145 to 5271 run-to-run
+  pid.Init(0.14,0.001,5.500);    
+
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -58,12 +67,31 @@ int main()
           * another PID controller to control the speed!
           */
           
+          // update the error for this timestep
+          pid.UpdateError(cte);
+
+          // calculate steering value based on total error
+          steer_value = pid.CalculateSteering();
+
+          //update frame ount
+          pid.n_frames += 1;
+          pid.cte_squared += cte*cte;
+
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
+          std::cout << "Frame: " << pid.n_frames << " CTE: " << cte << " Steering Value: " << steer_value << std::endl;
+
+          if (pid.n_frames == pid.full_lap_frames) {
+            std::cout << "----------" << std::endl;
+            std::cout << "CTE2: " << pid.cte_squared << std::endl;
+            std::cout << "KP: " << pid.Kp << "; KI: " << pid.Ki << "; KD: " << pid.Kd << std::endl;
+            std::cout << "----------" << std::endl;
+            pid.cte_squared = 0;
+            pid.n_frames = 0;
+          }
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.3;
+          msgJson["throttle"] = 0.6;  // INCREASE TO REACH HIGHER SPEED
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);

@@ -18,6 +18,13 @@ public:
   double Kd;
 
   /*
+  * Parameters for tuning
+  */
+  int n_frames;
+  int full_lap_frames = 8000; 
+  double cte_squared;
+
+  /*
   * Constructor
   */
   PID();
@@ -30,7 +37,7 @@ public:
   /*
   * Initialize PID.
   */
-  void Init(double Kp, double Ki, double Kd);
+  void Init(double Kp_set, double Ki_set, double Kd_set);
 
   /*
   * Update the PID error variables given cross track error.
@@ -41,6 +48,12 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
+
+  /*
+  * Calculate steering angle.
+  */
+  double CalculateSteering();
+
 };
 
 #endif /* PID_H */
